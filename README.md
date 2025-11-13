@@ -11,9 +11,14 @@ source ./procon/bin/activate
 pip3 install -r requirements
 ```
 
-## Running the server
+## Running this server
 
-1. Get a token passing your team name.
+1. Run the server using following command.
+```Shell
+ uvicorn server:app --reload --host 0.0.0.0 --port 8000
+```
+
+2. Get a token passing your team name.
 
 ```Shell
 curl -X 'POST' \
@@ -25,7 +30,7 @@ curl -X 'POST' \
     }'
 ```
 
-2. Get a problem using your token received from previous step.
+3. Get a problem using your token received from previous step.
 
 ```Shell
 curl -s -X GET http://127.0.0.1:8000/problem \
@@ -33,7 +38,7 @@ curl -s -X GET http://127.0.0.1:8000/problem \
 ```
 
 
-3. Submit your solution (not implemented yet)
+4. Submit your solution (not implemented yet)
 
 ```Shell
 curl -X 'POST' \
