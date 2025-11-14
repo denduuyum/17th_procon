@@ -2,7 +2,6 @@ import random as rd
 import copy
 from datetime import datetime
 import threading
-import asyncio
 
 def random_field(n):
     a = [[0] * n for i in range(n)]
