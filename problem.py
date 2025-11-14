@@ -2,7 +2,6 @@ import random as rd
 import copy
 from datetime import datetime
 import threading
-import asyncio
 
 def random_field(n):
     a = [[0] * n for i in range(n)]
@@ -23,7 +22,7 @@ def eval_score(a, n):
     score = 0
     for i in range(n):
         for j in range(n):
-            if a[i][j] > 0:
+            if a[i][j] >= 0:
                 if i + 1 < n and a[i][j] == a[i+1][j]:
                     score += 1
                     a[i][j] = a[i+1][j] = -1
@@ -76,7 +75,7 @@ class Problem:
         
     def new_submission(self, team, d):
         submission_time = int(datetime.now().timestamp())
-        a = copy.copy(self.field)
+        a = copy.deepcopy(self.field)
         for op in d.ops:
             x, y, size = op.x, op.y, op.n
             if x + size > self.n or y + size > self.n or x < 0 or y < 0:
