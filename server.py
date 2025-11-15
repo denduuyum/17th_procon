@@ -13,7 +13,7 @@ import asyncio
 
 
 # size of field
-N = 4
+N = 6
 start_time = int(datetime.now().timestamp())
 lock = threading.Lock()
 
