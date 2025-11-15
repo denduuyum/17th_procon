@@ -14,9 +14,57 @@ def random_field(n):
             a[i][j] =  Q[i*n +j]
     return a
 
-def random_rotate_field(n):
-    pass
+def rotate(a, n, x, y, size):
+    b = [[0] * size for i in range(size)]
+    for i in range(size):
+        for j in range(size):
+            b[i][j] = a[x + i][y + j]
 
+    for i in range(size):
+        for j in range(size):
+            a[x + j][y + size - 1 - i] = b[i][j]
+
+def random_rotate_field(n):
+    a = [[-1] * n for i in range(n)]
+    m = n * n // 2
+    k = 0
+    for i in range(n-1):
+        for j in range(n):
+            if a[i][j] == -1:
+                if j + 1 < n and i + 1 < n:
+                    t = rd.randrange(2)
+                    if t == 0 and a[i][j+1] == -1:
+                        a[i][j] = a[i][j+1] = k
+                    else:
+                        a[i][j] = a[i+1][j] = k
+                elif j + 1 < n and a[i][j+1] == -1:
+                    a[i][j] = a[i][j+1] = k
+                else:
+                    a[i][j] = a[i+1][j] = k
+                k += 1
+    t = 0    
+    for j in range(n):
+        if a[n-1][j] == -1:
+            a[n-1][j] = k
+            t += 1
+            if t == 2:
+                t = 0
+                k += 1
+
+    p = [i for i in range(m)]
+    rd.shuffle(p)
+    for i in range(n):
+        for j in range(n):
+            a[i][j] = p[a[i][j]]
+
+    N = n*n*n*n
+    for i in range(N):
+        x = rd.randrange(n-1)
+        y = rd.randrange(n-1)
+        size = rd.randrange(n - max(x, y))
+        rotate(a, n, x, y, size)
+
+    return a
 
 def eval_score(a, n):
     score = 0
@@ -31,15 +79,6 @@ def eval_score(a, n):
                     a[i][j] = a[i][j+1] = -1
     return score
 
-def rotate(a, n, x, y, size):
-    b = [[0] * size for i in range(size)]
-    for i in range(size):
-        for j in range(size):
-            b[i][j] = a[x + i][y + j]
-
-    for i in range(size):
-        for j in range(size):
-            a[x + j][y + size - 1 - i] = b[i][j]
 
 
 class Problem:
@@ -70,7 +109,7 @@ class Problem:
 
     def add_team(self, team):
         self.lock.acquire()
-        self.teams[team] = (0, 0)
+        self.teams[team] = (0, 0, 0)
         self.lock.release()
         
     def new_submission(self, team, d):
@@ -85,6 +124,6 @@ class Problem:
 
         score = eval_score(a, self.n)
         self.lock.acquire()
-        self.teams[team] = (score, submission_time)
+        self.teams[team] = (score, len(d.ops), submission_time)
         self.lock.release()
         return score, submission_time

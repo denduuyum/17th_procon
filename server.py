@@ -10,10 +10,11 @@ from team import Team
 import time
 import threading
 import asyncio
+import sys
 
 
 # size of field
-N = 4
+N = 24
 start_time = int(datetime.now().timestamp())
 lock = threading.Lock()
 
@@ -37,7 +38,7 @@ Tokens expire after **1 day**.
 )
 security = HTTPBearer()
 
-SECRET_KEY = "8Wu6WztGqkrswHSqbqLvyD3GAfEeXF0C"  # change in production
+SECRET_KEY = "8Wu6WztGqkrswHSqbqLvyD3GAfEeXF0Ca30u0R"  # change in production
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 1
 
@@ -59,12 +60,20 @@ class SubmitReq(BaseModel):
     ops: list[Op] = Field(..., example=[{"x":0, "y":0, "n":2}])
 
 async def print_scoreboard():
+    deadline = datetime.fromtimestamp(start_time) + timedelta(minutes = 5)
     while True:
-        scoreboard = [(k, v[0], -v[1]) for k, v in p.teams.items()]
-        scoreboard = sorted(scoreboard, key = lambda x: (x[1], x[2]), reverse = True)
+        now = datetime.now()
+        if now > deadline:
+            print('Problem ended')
+            break
+        print('Time left:', deadline - now)
+        p.lock.acquire()
+        scoreboard = [(k, v[0], -v[1], -v[2]) for k, v in p.teams.items()]
+        p.lock.release()
+        scoreboard = sorted(scoreboard, key = lambda x: (x[1], x[2], x[3]), reverse = True)
         print('==================================================')
         for i, x in enumerate(scoreboard):
-            print(str(i+1) + '. ' + x[0], x[1], -x[2])
+            print(str(i+1) + '. ' + x[0], x[1], -x[2], -x[3])
         print('==================================================')
         await asyncio.sleep(10)  # Run every 10 seconds
 
@@ -115,4 +124,4 @@ def submit(req: SubmitReq, credentials: HTTPAuthorizationCredentials = Depends(s
     if test:
         return {"User " + name + " is not registered"}
     score, submission_time = registered_users[name].submit(req)
-    return {"score": score, "submission_time": submission_time}
+    return {"score": score, "number_of_ops": len(req.ops), "submission_time": submission_time}
