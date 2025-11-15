@@ -15,7 +15,7 @@ pip3 install -r requirements
 
 1. Run the server using following command.
 ```Shell
- uvicorn server:app --reload --host 0.0.0.0 --port 8000
+uvicorn server:app --reload --log-config log.ini --host 0.0.0.0 --port 8000
 ```
 
 2. Get a token passing your team name.
