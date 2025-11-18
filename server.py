@@ -62,11 +62,6 @@ class SubmitReq(BaseModel):
 async def print_scoreboard():
     deadline = datetime.fromtimestamp(start_time) + timedelta(minutes = 5)
     while True:
-        now = datetime.now()
-        if now > deadline:
-            print('Problem ended')
-            break
-        print('Time left:', deadline - now)
         p.lock.acquire()
         scoreboard = [(k, v[0], -v[1], -v[2]) for k, v in p.teams.items()]
         p.lock.release()
@@ -75,6 +70,11 @@ async def print_scoreboard():
         for i, x in enumerate(scoreboard):
             print(str(i+1) + '. ' + x[0], x[1], -x[2], -x[3])
         print('==================================================')
+        now = datetime.now()
+        if now > deadline:
+            print('Problem ended')
+            break
+        print('Time left:', deadline - now)
         await asyncio.sleep(10)  # Run every 10 seconds
 
 @app.on_event("startup")
